@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analizador de representación de datos</title>
+  <style>
+    :root { --bg:#f6f7f9; --card:#fff; --txt:#1c1f24; --muted:#5b6370; --acc:#2457d6; --err:#b3261e; --line:#dfe3e8; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#14161a; --card:#1d2026; --txt:#e8eaee; --muted:#9aa3b0; --acc:#7da2ff; --err:#ff8a80; --line:#2d323a; }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:var(--txt); }
+    main { max-width: 820px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 1.6rem; margin: 0 0 4px; }
+    .sub { color: var(--muted); margin: 0 0 24px; }
+    section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:20px; }
+    h2 { font-size:1.15rem; margin:0 0 14px; }
+    label { display:block; font-weight:600; margin: 10px 0 4px; }
+    input[type=text], select { width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--txt); font:inherit; }
+    button { margin-top:14px; padding:9px 18px; border:0; border-radius:8px; background:var(--acc); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+    .errorlist { list-style:none; margin:6px 0 0; padding:0; color:var(--err); font-size:.92rem; }
+    dl { display:grid; grid-template-columns: max-content 1fr; gap:6px 16px; margin:18px 0 0; }
+    dt { color:var(--muted); }
+    dd { margin:0; font-family: ui-monospace, monospace; word-break: break-all; }
+    .tabla { overflow-x:auto; margin-top:18px; }
+    table { border-collapse:collapse; width:100%; }
+    th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); font-family: ui-monospace, monospace; }
+    th { font-family: system-ui, sans-serif; color:var(--muted); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Analizador de representación de datos</h1>
+  <p class="sub">Sistemas numéricos y codificación de caracteres.</p>
+
+  <section>
+    <h2>1. Conversor numérico</h2>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="numero">
+      <label for="{{ form_numero.numero.id_for_label }}">{{ form_numero.numero.label }}</label>
+      {{ form_numero.numero }}
+      {{ form_numero.numero.errors }}
+      <label for="{{ form_numero.base.id_for_label }}">{{ form_numero.base.label }}</label>
+      {{ form_numero.base }}
+      {{ form_numero.base.errors }}
+      <button type="submit">Convertir</button>
+    </form>
+
+    {% if resultado %}
+    <dl>
+      <dt>Decimal</dt><dd>{{ resultado.decimal }}</dd>
+      <dt>Binario</dt><dd>{{ resultado.binario }}</dd>
+      <dt>Octal</dt><dd>{{ resultado.octal }}</dd>
+      <dt>Hexadecimal</dt><dd>{{ resultado.hexadecimal }}</dd>
+      <dt>Bits significativos</dt><dd>{{ resultado.bits_significativos }}</dd>
+      <dt>Bytes necesarios</dt><dd>{{ resultado.bytes_necesarios }}</dd>
+    </dl>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>2. Analizador de texto (UTF-8)</h2>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="texto">
+      <label for="{{ form_texto.texto.id_for_label }}">{{ form_texto.texto.label }}</label>
+      {{ form_texto.texto }}
+      {{ form_texto.texto.errors }}
+      <button type="submit">Analizar</button>
+    </form>
+
+    {% if filas %}
+    <div class="tabla">
+      <table>
+        <thead>
+          <tr><th>Carácter</th><th>Decimal</th><th>Punto de código</th><th>Hexadecimal</th><th>Bytes UTF-8</th></tr>
+        </thead>
+        <tbody>
+          {% for f in filas %}
+          <tr>
+            <td>{% if f.caracter == " " %}(espacio){% else %}{{ f.caracter }}{% endif %}</td>
+            <td>{{ f.decimal }}</td>
+            <td>{{ f.unicode }}</td>
+            <td>{{ f.hexadecimal }}</td>
+            <td>{{ f.bytes_utf8 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </section>
+</main>
+</body>
+</html>

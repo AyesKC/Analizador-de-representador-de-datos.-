@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_DEBUG: "0"
+      DJANGO_SECRET_KEY: "cambie-esta-clave"
+      DJANGO_ALLOWED_HOSTS: "*"
+      deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+
